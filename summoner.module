@@ -1,0 +1,71 @@
+<?php
+/**
+ * @file
+ * Attach JS and CSS assets on demand from javascript using l.js.
+ */
+
+/**
+ * Implements hook_page_build().
+ */
+function summoner_init() {
+  if ($ljs_path = libraries_get_path('ljs')) {
+    drupal_add_js($ljs_path . '/l.js');
+    drupal_add_js(drupal_get_path('module', 'summoner') . '/summoner.js');
+  }
+  else {
+    drupal_set_message('The l.js library could not be found.', 'error');
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function summoner_menu() {
+  $items = array();
+  $items['summoner/fetch/%/%'] = array(
+    'page callback' => 'summoner_fetch_library',
+    'page arguments' => array(2, 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Fetch library paths to load them with l.js.
+ */
+function summoner_fetch_library($module, $library) {
+  // TODO: Add caching.
+  // TODO: Add parallel loading.
+  // TODO: Add aggregation.
+  drupal_static_reset('drupal_add_js');
+  drupal_static_reset('drupal_add_css');
+  $lib = drupal_get_library($module, $library);
+  $assets = array();
+  _summoner_fetch_recursive($lib, $assets);
+  kprint_r($assets);
+}
+
+/**
+ * Walk through library and its dependencies recursively and attach assets.
+ *
+ * @param mixed $library
+ *   Libraries info array returned by drupal_get_library.
+ * @param mixed $assets
+ *   Array to attach assets to.
+ */
+function _summoner_fetch_recursive($library, &$assets) {
+  if (array_key_exists('dependencies', $library)) {
+    foreach ($library['dependencies'] as $dep) {
+      list($mod, $lib) = $dep;
+      _summoner_fetch_recursive(drupal_get_library($mod, $lib), $assets);
+    }
+  }
+  foreach (array('css', 'js') as $type) {
+    foreach ($library[$type] as $asset => $info) {
+      if (!in_array('type', $info) || !in_array($info['type'], array('setting', 'inline'))) {
+        $assets[] = $asset;
+      }
+    }
+  }
+}

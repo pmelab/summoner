@@ -1,0 +1,4 @@
+name = "Summoner"
+description = Post-load JS/CSS assets on demand.
+core = "7.x"
+package = "Development"
