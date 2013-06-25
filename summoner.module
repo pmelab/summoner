@@ -5,19 +5,6 @@
  */
 
 /**
- * Implements hook_page_build().
- */
-function summoner_init() {
-  if ($ljs_path = libraries_get_path('ljs')) {
-    drupal_add_js($ljs_path . '/l.js');
-    drupal_add_js(drupal_get_path('module', 'summoner') . '/summoner.js');
-  }
-  else {
-    drupal_set_message('The l.js library could not be found.', 'error');
-  }
-}
-
-/**
  * Implements hook_menu().
  */
 function summoner_menu() {
@@ -35,15 +22,16 @@ function summoner_menu() {
  * Fetch library paths to load them with l.js.
  */
 function summoner_fetch_library($module, $library) {
-  // TODO: Add caching.
-  // TODO: Add parallel loading.
-  // TODO: Add aggregation.
   drupal_static_reset('drupal_add_js');
   drupal_static_reset('drupal_add_css');
   $lib = drupal_get_library($module, $library);
-  $assets = array();
+  $assets = array(
+    'assets' => array(),
+    'settings' => array(),
+  );
   _summoner_fetch_recursive($lib, $assets);
-  kprint_r($assets);
+  // TODO: Add aggregation.
+  print json_encode($assets);
 }
 
 /**
@@ -63,8 +51,28 @@ function _summoner_fetch_recursive($library, &$assets) {
   }
   foreach (array('css', 'js') as $type) {
     foreach ($library[$type] as $asset => $info) {
-      if (!in_array('type', $info) || !in_array($info['type'], array('setting', 'inline'))) {
-        $assets[] = $asset;
+      if (!array_key_exists('type', $info)) {
+        $info['type'] = 'file';
+      }
+      switch ($info['type']) {
+        case 'file':
+          $assets['assets'][] = array(
+            'data' => url($asset),
+            'uri' => $asset,
+            'type' => $type,
+          );
+          break;
+
+        case 'inline':
+          $assets['assets'][] = array(
+            'data' => $asset,
+            'uri' => 'inline',
+            'type' => $type,
+          );
+          break;
+
+        case 'setting':
+          $assets['settings'] = array_merge_recursive($assets['settings'], $info['data']);
       }
     }
   }
