@@ -22,8 +22,6 @@ function summoner_menu() {
  * Fetch library paths to load them with l.js.
  */
 function summoner_fetch_library($module, $library) {
-  drupal_static_reset('drupal_add_js');
-  drupal_static_reset('drupal_add_css');
   $lib = drupal_get_library($module, $library);
   $assets = array(
     'assets' => array(),
