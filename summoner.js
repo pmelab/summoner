@@ -9,7 +9,7 @@
   var isJS = /\.js$/;
   var isCSS = /\.css$/;
 
-  var summonRecursive = function (assets, callback) {
+  var summonRecursive = function (assets, callback, type) {
     assets = $.isArray(assets) ? assets : [assets];
     if (assets.length == 0) {
       callback(assets, callback);
@@ -20,10 +20,10 @@
     // Make asset objects of string assets.
     if (typeof asset !== 'object') {
       asset = { data: asset, uri: asset };
-      if (isCSS.test(asset.data)) {
+      if (isCSS.test(asset.data) || type == 'css') {
         asset.type = 'css';
       }
-      else if (isJS.test(asset.data)) {
+      else if (isJS.test(asset.data) || type == 'js') {
         asset.type = 'js';
       }
       else {
@@ -94,10 +94,10 @@
     }
   };
 
-  Drupal.summon = function (assets, callback) {
+  Drupal.summon = function (assets, callback, type) {
     summonRecursive(assets, function() {
       callback(Drupal.settings);
-    });
+    }, type);
   };
 
 }(jQuery, Drupal));
