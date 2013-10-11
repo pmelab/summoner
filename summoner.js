@@ -47,6 +47,10 @@
       return;
     }
 
+    Drupal.settings.ajaxPageState = Drupal.settings.ajaxPageState || {};
+    Drupal.settings.ajaxPageState.js = Drupal.settings.ajaxPageState.js || {};
+    Drupal.settings.ajaxPageState.css = Drupal.settings.ajaxPageState.css || {};
+
     // Load javascript assets with jquery $.getScript()
     if (asset.type === 'js') {
       if (Drupal.settings.ajaxPageState.js[asset.uri]) {
