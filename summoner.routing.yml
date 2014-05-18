@@ -1,0 +1,7 @@
+summoner.load:
+  path: '/summoner/load/{id}'
+  defaults:
+    _content: '\Drupal\summoner\Controller\SummonerController::load'
+  requirements:
+    _access: 'TRUE'
+    _method: 'REPLACEWITH'

@@ -1,0 +1,4 @@
+name: Summoner
+type: module
+description: Load frontend assets on demand.
+core: 8.x
