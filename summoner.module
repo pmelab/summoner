@@ -9,9 +9,9 @@
  */
 function summoner_menu() {
   $items = array();
-  $items['summoner/fetch/%/%'] = array(
-    'page callback' => 'summoner_fetch_library',
-    'page arguments' => array(2, 3),
+  $items['summoner/load/%'] = array(
+    'page callback' => 'summoner_load_libraries',
+    'page arguments' => array(2),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -19,59 +19,41 @@ function summoner_menu() {
 }
 
 /**
- * Fetch library paths to load them with l.js.
+ * Implements hook_library().
  */
-function summoner_fetch_library($module, $library) {
-  $lib = drupal_get_library($module, $library);
-  $assets = array(
-    'assets' => array(),
-    'settings' => array(),
+function summoner_library() {
+  $libraries = array();
+  $libraries['summoner'] = array(
+    'title' => t('Summoner'),
+    'website' => 'http://www.drupal.org/project/summoner',
+    'version' => '1.0',
+    'js' => array(
+      drupal_get_path('module', 'summoner') . '/assets/summoner.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'drupal.ajax'),
+    ),
   );
-  _summoner_fetch_recursive($lib, $assets);
-  // TODO: Add aggregation.
-  print json_encode($assets);
+  return $libraries;
 }
 
 /**
- * Walk through library and its dependencies recursively and attach assets.
- *
- * @param mixed $library
- *   Libraries info array returned by drupal_get_library.
- * @param mixed $assets
- *   Array to attach assets to.
+ * Fetch library paths to load them with l.js.
  */
-function _summoner_fetch_recursive($library, &$assets) {
-  if (array_key_exists('dependencies', $library)) {
-    foreach ($library['dependencies'] as $dep) {
-      list($mod, $lib) = $dep;
-      _summoner_fetch_recursive(drupal_get_library($mod, $lib), $assets);
-    }
+function summoner_load_libraries($id) {
+  $libraries = explode(',', $_GET['libraries']);
+  $attached['#attached'] = array('library' => array());
+  foreach ($libraries as $library) {
+    $attached['#attached']['library'][] = explode('/', $library);
   }
-  foreach (array('css', 'js') as $type) {
-    foreach ($library[$type] as $asset => $info) {
-      if (!array_key_exists('type', $info)) {
-        $info['type'] = 'file';
-      }
-      switch ($info['type']) {
-        case 'file':
-          $assets['assets'][] = array(
-            'data' => url($asset),
-            'uri' => $asset,
-            'type' => $type,
-          );
-          break;
-
-        case 'inline':
-          $assets['assets'][] = array(
-            'data' => $asset,
-            'uri' => 'inline',
-            'type' => $type,
-          );
-          break;
-
-        case 'setting':
-          $assets['settings'] = array_merge_recursive($assets['settings'], $info['data']);
-      }
-    }
-  }
+  $attached['#attached']['js'][] = array(
+    'type' => 'setting',
+    'data' => array('summoner-id' => $id),
+  );
+  $page = array(
+    '#type' => 'ajax',
+    '#commands' => array(ajax_command_invoke('body', 'summonerLoaded', array($id))),
+  );
+  drupal_render($attached);
+  ajax_deliver($page);
 }

@@ -1,0 +1,72 @@
+<?php
+/**
+ * @file
+ * Summoner test implementation.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function summoner_test_menu() {
+  $items = array();
+  $items['summoner/test'] = array(
+    'title' => 'Summoner Test',
+    'page callback' => 'summoner_test_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Simple page callback return markup for the summoner testpage.
+ */
+function summoner_test_page() {
+  $page = array();
+  $page['#attached'] = array(
+    'library' => array(
+      array('summoner_test', 'summoner.test'),
+    ),
+  );
+  $page['link'] = array(
+    '#type' => 'link',
+    '#title' => 'Dynamic link',
+    '#href' => 'summoner/test',
+    '#id' => 'summoner-test-link',
+  );
+  $page['text'] = array(
+    '#markup' => '<p class="summoner-test-css">This will be red!</p>',
+  );
+  return $page;
+}
+
+/**
+ * Implements hook_library().
+ */
+function summoner_test_library() {
+  $libraries = array();
+  $libraries['summoner.test'] = array(
+    'title' => t('Summoner Test'),
+    'website' => 'http://www.drupal.org/project/summoner',
+    'version' => '1.0',
+    'js' => array(
+      drupal_get_path('module', 'summoner_test') . '/assets/summoner-test.js' => array(),
+    ),
+    'dependencies' => array(
+      array('summoner', 'summoner'),
+    ),
+  );
+
+  $libraries['summoner.testlib'] = array(
+    'title' => t('Summoner Testlib'),
+    'website' => 'http://www.drupal.org/project/summoner',
+    'version' => '1.0',
+    'js' => array(
+      drupal_get_path('module', 'summoner_test') . '/assets/summoner-testlib.js' => array(),
+    ),
+    'css' => array(
+      drupal_get_path('module', 'summoner_test') . '/assets/summoner-testlib.css' => array(),
+    ),
+  );
+  return $libraries;
+}
