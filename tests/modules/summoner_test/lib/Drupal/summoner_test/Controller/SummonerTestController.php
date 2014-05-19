@@ -15,7 +15,7 @@ class SummonerTestController {
       '#theme' => 'summoner_test_page',
       '#link' => array(
         '#type' => 'link',
-        '#title' => 'Test',
+        '#title' => 'Dynamic link',
         '#href' => 'summoner/test',
         '#id' => 'summoner-test-link',
       ),
@@ -25,8 +25,5 @@ class SummonerTestController {
         ),
       ),
     );
-  }
-
-  public function testAjax() {
   }
 }

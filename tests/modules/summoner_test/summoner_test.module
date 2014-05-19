@@ -9,6 +9,7 @@ function summoner_test_theme($existing, $type, $theme, $path) {
     'summoner_test_page' => array(
       'variables' => array(
         'link' => NULL,
+        'testlink' => NULL,
       ),
       'path' => drupal_get_path('module', 'summoner_test') . '/templates',
       'template' => 'summoner-test-page',

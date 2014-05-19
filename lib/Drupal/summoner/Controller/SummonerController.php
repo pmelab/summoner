@@ -7,7 +7,7 @@
 namespace Drupal\summoner\Controller;
 
 use Drupal\Core\Ajax\AjaxResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Drupal\Core\Ajax\InvokeCommand;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -16,18 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 class SummonerController {
   /**
    * @param Request $request
-   * @return JsonResponse
+   * @return AjaxResponse
    */
   public function load(Request $request) {
     $id = $request->attributes->get('id');
-    $params = explode(',', $request->get('libraries'));
-    $libraries = array();
-    foreach ($params as $param) {
-      $libraries[] = explode(':', $param);
-    }
+    $libraries = explode(',', $request->get('libraries'));
     $attached['#attached'] = array('library' => array());
     foreach ($libraries as $library) {
-      $attached['#attached']['library'][] = $library[0] . '/' . $library[1];
+      $attached['#attached']['library'][] = $library;
     }
     $attached['#attached']['js'][] = array(
       'type' => 'setting',
@@ -35,6 +31,7 @@ class SummonerController {
     );
     drupal_render($attached);
     $response = new AjaxResponse();
+    $response->addCommand(new InvokeCommand('body', 'summonerLoaded', array($id)));
     return $response;
   }
 }

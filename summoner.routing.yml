@@ -4,4 +4,3 @@ summoner.load:
     _content: '\Drupal\summoner\Controller\SummonerController::load'
   requirements:
     _access: 'TRUE'
-    _method: 'REPLACEWITH'

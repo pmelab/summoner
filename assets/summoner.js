@@ -16,8 +16,7 @@
     $link.appendTo($summonerAnchor);
     Drupal.behaviors.AJAX.attach($summonerAnchor, drupalSettings);
     summonerCallbacks[summonerRequest] = callback;
-    Drupal.ajax[id].options.data.libraries = libraries;
-    $.ajax(Drupal.ajax[id]);
+    $link.click();
   };
 
   Drupal.behaviors.summoner = {
@@ -32,7 +31,9 @@
   $.fn.summonerLoaded = function(id) {
     $('#summoner-link-' + id).remove();
     $('#summoner-loaded-' + id).remove();
-    summonerCallbacks[id]();
+    if (summonerCallbacks[id]) {
+      summonerCallbacks[id]();
+    }
   };
 
 }(jQuery, Drupal, drupalSettings));

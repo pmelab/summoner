@@ -10,4 +10,5 @@ summoner.testlib:
   js:
     assets/summoner-testlib.js: {}
   css:
-    assets/summoner-testlib.css: {}
+    theme:
+      assets/summoner-testlib.css: {}
