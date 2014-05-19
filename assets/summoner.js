@@ -8,7 +8,7 @@
 
   var summonerCallbacks = {};
 
-  Drupal.summon = function (libraries, callback, type) {
+  Drupal.summon = function (libraries, callback) {
     libraries = $.isArray(libraries) ? libraries : [libraries];
     var id = "summoner-link-" + (++summonerRequest);
     var url = Drupal.url('summoner/load/' + summonerRequest + '?libraries=' + libraries.join(','));
@@ -20,7 +20,7 @@
   };
 
   Drupal.behaviors.summoner = {
-    attach: function (context, settings) {
+    attach: function () {
       if (!$summonerAnchor) {
         $summonerAnchor = $('<div style="display: none" id="summoner-anchor"/>');
         $summonerAnchor.appendTo('body');
