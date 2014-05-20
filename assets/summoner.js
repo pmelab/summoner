@@ -10,8 +10,11 @@
 
   Drupal.summon = function (libraries, callback) {
     libraries = $.isArray(libraries) ? libraries : [libraries];
+    $.each(libraries, function (index, lib){
+      libraries[index] = lib.replace('/', '::');
+    });
     var id = "summoner-link-" + (++summonerRequest);
-    var url = Drupal.settings.basePath + 'summoner/load/' + summonerRequest + '?libraries=' + libraries.join(',');
+    var url = Drupal.settings.basePath + 'summoner/load/' + summonerRequest + '/' + libraries.join(',');
     var $link = $('<a id="' + id + '" href="' + url + '" class="use-ajax"/>');
     $link.appendTo($summonerAnchor);
     Drupal.behaviors.AJAX.attach($summonerAnchor, Drupal.settings);

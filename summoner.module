@@ -5,20 +5,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function summoner_menu() {
-  $items = array();
-  $items['summoner/load/%'] = array(
-    'page callback' => 'summoner_load_libraries',
-    'page arguments' => array(2),
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
-}
-
-/**
  * Implements hook_library().
  */
 function summoner_library() {
@@ -38,22 +24,44 @@ function summoner_library() {
 }
 
 /**
- * Fetch library paths to load them with l.js.
+ * Implements hook_menu().
  */
-function summoner_load_libraries($id) {
-  $libraries = explode(',', $_GET['libraries']);
-  $attached['#attached'] = array('library' => array());
-  foreach ($libraries as $library) {
-    $attached['#attached']['library'][] = explode('/', $library);
-  }
-  $attached['#attached']['js'][] = array(
-    'type' => 'setting',
-    'data' => array('summoner-id' => $id),
+function summoner_menu() {
+  $items = array();
+  $items['summoner/load/%/%summoner_libraries'] = array(
+    'page callback' => 'summoner_load',
+    'page arguments' => array(2, 3),
+    'load arguments' => array(3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
   );
+  return $items;
+}
+
+/**
+ * Argument autoloader for libraries.
+ */
+function summoner_libraries_load($libraries) {
+  $libraries = explode(',', $libraries);
+  foreach ($libraries as $index => $lib) {
+    list($module, $name) = explode('::', $lib);
+    if (!drupal_get_library($module, $name)) {
+      return FALSE;
+    }
+    $libraries[$index] = array($module, $name);
+  }
+  return $libraries;
+}
+
+/**
+ * Build an AJAX response that causes Drupal to load additional required assets.
+ */
+function summoner_load($id, $libraries) {
+  $attached['#attached'] = array('library' => $libraries);
+  drupal_render($attached);
   $page = array(
     '#type' => 'ajax',
     '#commands' => array(ajax_command_invoke('body', 'summonerLoaded', array($id))),
   );
-  drupal_render($attached);
   ajax_deliver($page);
 }
