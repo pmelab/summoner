@@ -7,6 +7,7 @@
 
 namespace Drupal\summoner\ParamConverter;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
+use Drupal\summoner\LibraryList;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -19,17 +20,13 @@ class LibraryConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function convert($value, $definition, $name, array $defaults, Request $request) {
-    $libraries = explode(',', $value);
-    foreach ($libraries as $index => $lib) {
-      $libraries[$index] = str_replace('::', '/', $lib);
-    }
-    return $libraries;
+    return new LibraryList($value);
   }
 
   /**
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    return !empty($definition['type']) && $definition['type'] == 'summoner.libraries';
+    return !empty($definition['type']) && $definition['type'] == 'summoner:libraries';
   }
 }

@@ -8,6 +8,7 @@ namespace Drupal\summoner\Controller;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\summoner\LibraryList;
 
 /**
  * Page callback controller for fetching asset uri's.
@@ -15,10 +16,10 @@ use Drupal\Core\Ajax\InvokeCommand;
 class SummonerController {
   /**
    * @param integer $id
-   * @param array $libraries
+   * @param LibraryList $libraries
    * @return AjaxResponse
    */
-  public function load($id, $libraries) {
+  public function load($id, LibraryList $libraries) {
     $attached['#attached'] = array('library' => $libraries);
     drupal_render($attached);
     $response = new AjaxResponse();
