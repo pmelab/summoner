@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for summoner.
+ */
+
+/**
+ * Implements hook_library_alter().
+ */
+function summoner_library_alter(array &$library, $name) {
+  $library['js'][] = array(
+    'data' => array('summonerState' => array($name => TRUE)),
+    'type' => 'setting',
+  );
+}

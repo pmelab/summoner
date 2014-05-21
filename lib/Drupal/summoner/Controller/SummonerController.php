@@ -20,7 +20,21 @@ class SummonerController {
    * @return AjaxResponse
    */
   public function load($id, LibraryList $libraries) {
-    $attached['#attached'] = array('library' => $libraries);
+    $state = array();
+    foreach ($libraries as $lib) {
+      $state[$lib] = TRUE;
+    }
+
+    $attached['#attached'] = array(
+      'library' => $libraries,
+      'js' => array(
+        array(
+          'data' => array('summonerState' => $state),
+          'type' => 'setting',
+        ),
+      ),
+    );
+
     drupal_render($attached);
     $response = new AjaxResponse();
     $response->addCommand(new InvokeCommand('body', 'summonerLoaded', array($id)));

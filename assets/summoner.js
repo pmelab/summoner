@@ -7,19 +7,29 @@
   var $summonerAnchor = false;
 
   var summonerCallbacks = {};
+  drupalSettings.summonerState = drupalSettings.summonerState || {};
 
   Drupal.summon = function (libraries, callback) {
     libraries = $.isArray(libraries) ? libraries : [libraries];
-    $.each(libraries, function (index, lib) {
-      libraries[index] = lib.replace('/', '::');
+    var toLoad = [];
+    $.each(libraries, function (index, lib){
+      if (!drupalSettings.summonerState[lib]) {
+        var library = lib.replace('/', '::');
+        toLoad.push(library);
+      }
     });
-    var id = "summoner-link-" + (++summonerRequest);
-    var url = Drupal.url('summoner/load/' + summonerRequest + '/' + libraries.join(','));
-    var $link = $('<a id="' + id + '" href="' + url + '" class="use-ajax"/>');
-    $link.appendTo($summonerAnchor);
-    Drupal.behaviors.AJAX.attach($summonerAnchor, drupalSettings);
-    summonerCallbacks[summonerRequest] = callback;
-    $link.click();
+    if (toLoad.length > 0) {
+      var id = "summoner-link-" + (++summonerRequest);
+      var url = Drupal.url('summoner/load/' + summonerRequest + '/' + toLoad.join(','));
+      var $link = $('<a id="' + id + '" href="' + url + '" class="use-ajax"/>');
+      $link.appendTo($summonerAnchor);
+      Drupal.behaviors.AJAX.attach($summonerAnchor, drupalSettings);
+      summonerCallbacks[summonerRequest] = callback;
+      $link.click();
+    }
+    else {
+      callback();
+    }
   };
 
   Drupal.behaviors.summoner = {
