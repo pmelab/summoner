@@ -24,6 +24,18 @@ function summoner_library() {
 }
 
 /**
+ * Implements hook_library_alter().
+ */
+function summoner_library_alter(&$libraries, $module) {
+  foreach (array_keys($libraries) as $lib) {
+    $libraries[$lib]['js'][] = array(
+      'data' => array('summonerState' => array($module . '/' . $lib => TRUE)),
+      'type' => 'setting',
+    );
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function summoner_menu() {
