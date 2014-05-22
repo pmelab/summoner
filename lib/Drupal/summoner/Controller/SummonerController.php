@@ -28,16 +28,20 @@ class SummonerController {
     $attached['#attached'] = array(
       'library' => $libraries,
       'js' => array(
-        array(
+        'state' => array(
           'data' => array('summonerState' => $state),
           'type' => 'setting',
+        ),
+        'inline' => array(
+          'type' => 'inline',
+          'group' => 'summon',
+          'data' => 'Drupal.behaviors.summonerLoad' . $id . ' = { attach: function() {  jQuery(this).summonerLoaded(' . $id . '); } };',
         ),
       ),
     );
 
     drupal_render($attached);
     $response = new AjaxResponse();
-    $response->addCommand(new InvokeCommand('body', 'summonerLoaded', array($id)));
     return $response;
   }
 }
