@@ -40,10 +40,10 @@ function summoner_library_alter(&$libraries, $module) {
  */
 function summoner_menu() {
   $items = array();
-  $items['summoner/load/%/%summoner_libraries'] = array(
+  $items['summoner/load/%summoner_libraries'] = array(
     'page callback' => 'summoner_load',
-    'page arguments' => array(2, 3),
-    'load arguments' => array(3),
+    'page arguments' => array(2),
+    'load arguments' => array(2),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -68,12 +68,13 @@ function summoner_libraries_load($libraries) {
 /**
  * Build an AJAX response that causes Drupal to load additional required assets.
  */
-function summoner_load($id, $libraries) {
+function summoner_load($libraries) {
   $state = array();
   foreach ($libraries as $lib) {
     $state[implode('/', $lib)] = TRUE;
   }
-
+  $id = implode(',', array_keys($state));
+  $hash = drupal_hash_base64($id);
   $attached['#attached'] = array(
     'library' => $libraries,
     'js' => array(
@@ -82,7 +83,7 @@ function summoner_load($id, $libraries) {
         'type' => 'setting',
       ),
       'inline' => array(
-        'data' => 'Drupal.behaviors.summonerLoad' . $id . ' = { attach: function() {  jQuery(this).summonerLoaded(' . $id . '); } };',
+        'data' => 'Drupal.behaviors.summonerLoad' . $hash . ' = { attach: function() {  jQuery(this).summonerLoaded("' . $id . '", "' . $hash . '"); } };',
         'type' => 'inline',
         // @see summoner_js_alter().
         'group' => 'summon',

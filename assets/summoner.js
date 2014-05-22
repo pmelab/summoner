@@ -3,7 +3,6 @@
  * Load javascript, css and library assets on demand.
  */
 (function($, Drupal){
-  var summonerRequest = 0;
   var $summonerAnchor = false;
 
   var summonerCallbacks = {};
@@ -14,18 +13,21 @@
     var toLoad = [];
     $.each(libraries, function (index, lib){
       if (!Drupal.settings.summonerState[lib]) {
-        var library = lib.replace('/', '::');
-        toLoad.push(library);
+        toLoad.push(lib);
       }
     });
     if (toLoad.length > 0) {
-      var id = "summoner-link-" + (++summonerRequest);
-      var url = Drupal.settings.basePath + 'summoner/load/' + summonerRequest + '/' + toLoad.join(',');
-      var $link = $('<a id="' + id + '" href="' + url + '" class="use-ajax"/>');
-      $link.appendTo($summonerAnchor);
-      Drupal.behaviors.AJAX.attach($summonerAnchor, Drupal.settings);
-      summonerCallbacks[summonerRequest] = callback;
-      $link.click();
+      toLoad.sort();
+      var id = toLoad.join(',');
+      if (!summonerCallbacks[id]) {
+        summonerCallbacks[id] = [];
+        var url = Drupal.settings.basePath + 'summoner/load/' + id.replace('/', '::');
+        var $link = $('<a data-id="summoner-link-' + id + '" href="' + url + '" class="use-ajax"/>');
+        $link.appendTo($summonerAnchor);
+        Drupal.behaviors.AJAX.attach($summonerAnchor, Drupal.settings);
+        $link.click();
+      }
+      summonerCallbacks[id].push(callback);
     }
     else {
       callback();
@@ -41,13 +43,14 @@
     }
   };
 
-  $.fn.summonerLoaded = function(id) {
-    $('#summoner-link-' + id).remove();
-    $('#summoner-loaded-' + id).remove();
+  $.fn.summonerLoaded = function(id, hash) {
+    $('[data-id="summoner-link-' + id +'"]"').remove();
     if (summonerCallbacks[id]) {
-      summonerCallbacks[id]();
+      $.each(summonerCallbacks[id], function(index, callback) {
+        callback();
+      });
     }
-    Drupal.behaviors['summonerLoaded' + id] = null;
+    Drupal.behaviors['summonerLoaded' + hash] = null;
   };
 
 }(jQuery, Drupal));
