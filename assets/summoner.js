@@ -47,6 +47,7 @@
     if (summonerCallbacks[id]) {
       summonerCallbacks[id]();
     }
+    Drupal.behaviors['summonerLoaded' + id] = null;
   };
 
 }(jQuery, Drupal));

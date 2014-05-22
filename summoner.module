@@ -77,9 +77,15 @@ function summoner_load($id, $libraries) {
   $attached['#attached'] = array(
     'library' => $libraries,
     'js' => array(
-      array(
+      'state' => array(
         'data' => array('summonerState' => $state),
         'type' => 'setting',
+      ),
+      'inline' => array(
+        'data' => 'Drupal.behaviors.summonerLoad' . $id . ' = { attach: function() {  jQuery(this).summonerLoaded(' . $id . '); } };',
+        'type' => 'inline',
+        // @see summoner_js_alter().
+        'group' => 'summon',
       ),
     ),
   );
@@ -87,7 +93,25 @@ function summoner_load($id, $libraries) {
   drupal_render($attached);
   $page = array(
     '#type' => 'ajax',
-    '#commands' => array(ajax_command_invoke('body', 'summonerLoaded', array($id))),
+    '#commands' => array(),
   );
   ajax_deliver($page);
+}
+
+/**
+ * Implements hook_js_alter().
+ *
+ * Workaround for @todo in ajax.inc line 250.
+ * Inline js and css are stripped out of ajax responses because of their numeric
+ * key. drupal_process_attached() always sets the key numeric, thats why we
+ * alter it afterwards.
+ */
+function summoner_js_alter(&$js) {
+  foreach (array_keys($js) as $id) {
+    if (is_numeric($id) && $js[$id]['group'] == 'summon') {
+      $js[$js[$id]['data']] = $js[$id];
+      $js[$js[$id]['data']]['group'] = 'theme';
+      unset($js[$id]);
+    }
+  }
 }
