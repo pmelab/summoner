@@ -1,5 +1,5 @@
 summoner.load:
-  path: '/summoner/load/{id}/{libraries}'
+  path: '/summoner/load/{libraries}'
   defaults:
     _content: '\Drupal\summoner\Controller\SummonerController::load'
   requirements:
