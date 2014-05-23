@@ -74,7 +74,6 @@ function summoner_load($libraries) {
     $state[implode('/', $lib)] = TRUE;
   }
   $id = implode(',', array_keys($state));
-  $hash = drupal_hash_base64($id);
   $attached['#attached'] = array(
     'library' => $libraries,
     'js' => array(
@@ -83,7 +82,7 @@ function summoner_load($libraries) {
         'type' => 'setting',
       ),
       'inline' => array(
-        'data' => 'Drupal.behaviors.summonerLoad' . $hash . ' = { attach: function() {  jQuery(this).summonerLoaded("' . $id . '", "' . $hash . '"); } };',
+        'data' => 'Drupal.summoner.attachBehavior("' . $id . '");',
         'type' => 'inline',
         // @see summoner_js_alter().
         'group' => 'summon',

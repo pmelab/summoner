@@ -3,10 +3,36 @@
  * Load javascript, css and library assets on demand.
  */
 (function($, Drupal){
-  var $summonerAnchor = false;
 
+  var $summonerAnchor = false;
   var summonerCallbacks = {};
+
   Drupal.settings.summonerState = Drupal.settings.summonerState || {};
+  Drupal.summoner = {};
+
+
+  Drupal.behaviors.summoner = {
+    attach: function () {
+      if (!$summonerAnchor) {
+        $summonerAnchor = $('<div style="display: none" id="summoner-anchor"/>');
+        $summonerAnchor.appendTo('body');
+      }
+    }
+  };
+
+  Drupal.summoner.attachBehavior = function (libraries) {
+    Drupal.behaviors['summonerLoad-' + libraries] = {
+      attach: function () {
+        $('a[data-libraries="' + libraries +'"]"').remove();
+        if (summonerCallbacks[libraries]) {
+          $.each(summonerCallbacks[libraries], function(index, callback) {
+            callback();
+          });
+        }
+        Drupal.behaviors['summonerLoad-' + libraries] = null;
+      }
+    };
+  };
 
   Drupal.summon = function (libraries, callback) {
     libraries = $.isArray(libraries) ? libraries : [libraries];
@@ -22,7 +48,7 @@
       if (!summonerCallbacks[id]) {
         summonerCallbacks[id] = [];
         var url = Drupal.settings.basePath + 'summoner/load/' + id.replace('/', '::');
-        var $link = $('<a data-id="summoner-link-' + id + '" href="' + url + '" class="use-ajax"/>');
+        var $link = $('<a data-libraries="' + id + '" href="' + url + '" class="use-ajax"/>');
         $link.appendTo($summonerAnchor);
         Drupal.behaviors.AJAX.attach($summonerAnchor, Drupal.settings);
         $link.click();
@@ -32,25 +58,6 @@
     else {
       callback();
     }
-  };
-
-  Drupal.behaviors.summoner = {
-    attach: function () {
-      if (!$summonerAnchor) {
-        $summonerAnchor = $('<div style="display: none" id="summoner-anchor"/>');
-        $summonerAnchor.appendTo('body');
-      }
-    }
-  };
-
-  $.fn.summonerLoaded = function(id, hash) {
-    $('[data-id="summoner-link-' + id +'"]"').remove();
-    if (summonerCallbacks[id]) {
-      $.each(summonerCallbacks[id], function(index, callback) {
-        callback();
-      });
-    }
-    Drupal.behaviors['summonerLoaded' + hash] = null;
   };
 
 }(jQuery, Drupal));
