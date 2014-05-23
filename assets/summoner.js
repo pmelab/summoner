@@ -3,23 +3,11 @@
  * Load javascript, css and library assets on demand.
  */
 (function($, Drupal){
-
-  var $summonerAnchor = false;
   var summonerCallbacks = {};
 
   Drupal.settings.summonerState = Drupal.settings.summonerState || {};
+
   Drupal.summoner = {};
-
-
-  Drupal.behaviors.summoner = {
-    attach: function () {
-      if (!$summonerAnchor) {
-        $summonerAnchor = $('<div style="display: none" id="summoner-anchor"/>');
-        $summonerAnchor.appendTo('body');
-      }
-    }
-  };
-
   Drupal.summoner.attachBehavior = function (libraries) {
     Drupal.behaviors['summonerLoad-' + libraries] = {
       attach: function () {
@@ -48,10 +36,10 @@
       if (!summonerCallbacks[id]) {
         summonerCallbacks[id] = [];
         var url = Drupal.settings.basePath + 'summoner/load/' + id.replace('/', '::');
-        var $link = $('<a data-libraries="' + id + '" href="' + url + '" class="use-ajax"/>');
-        $link.appendTo($summonerAnchor);
-        Drupal.behaviors.AJAX.attach($summonerAnchor, Drupal.settings);
-        $link.click();
+        var element = $('body');
+        var ajax = new Drupal.ajax(url, element, { url: url, event: 'mousedown' });
+        ajax.beforeSerialize(ajax.element, ajax.options);
+        $.ajax(ajax.options);
       }
       summonerCallbacks[id].push(callback);
     }
