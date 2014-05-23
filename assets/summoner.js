@@ -7,8 +7,7 @@
 
   Drupal.settings.summonerState = Drupal.settings.summonerState || {};
 
-  Drupal.summoner = {};
-  Drupal.summoner.attachBehavior = function (libraries) {
+  Drupal.summonerAttachBehavior = function (libraries) {
     Drupal.behaviors['summonerLoad-' + libraries] = {
       attach: function () {
         $('a[data-libraries="' + libraries +'"]"').remove();
@@ -32,16 +31,16 @@
     });
     if (toLoad.length > 0) {
       toLoad.sort();
-      var id = toLoad.join(',');
-      if (!summonerCallbacks[id]) {
-        summonerCallbacks[id] = [];
-        var url = Drupal.settings.basePath + 'summoner/load/' + id.replace('/', '::');
+      var libs = toLoad.join(',');
+      if (!summonerCallbacks[libs]) {
+        summonerCallbacks[libs] = [];
+        var url = Drupal.settings.basePath + 'summoner/load/' + libs.replace('/', '::');
         var element = $('body');
         var ajax = new Drupal.ajax(url, element, { url: url, event: 'mousedown' });
         ajax.beforeSerialize(ajax.element, ajax.options);
         $.ajax(ajax.options);
       }
-      summonerCallbacks[id].push(callback);
+      summonerCallbacks[libs].push(callback);
     }
     else {
       callback();

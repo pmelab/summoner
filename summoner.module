@@ -66,23 +66,37 @@ function summoner_libraries_load($libraries) {
 }
 
 /**
- * Build an AJAX response that causes Drupal to load additional required assets.
+ * Generate library string required by javascript components.
  */
-function summoner_load($libraries) {
+function summoner_libraries_string($libraries) {
+  return implode(',', array_keys(summoner_libraries_state($libraries)));
+}
+
+/**
+ * Generate a state array, delivered as setting to the javascript components.
+ */
+function summoner_libraries_state($libraries) {
   $state = array();
   foreach ($libraries as $lib) {
     $state[implode('/', $lib)] = TRUE;
   }
-  $id = implode(',', array_keys($state));
+  return $state;
+}
+
+/**
+ * Build an AJAX response that causes Drupal to load additional required assets.
+ */
+function summoner_load($libraries) {
+
   $attached['#attached'] = array(
     'library' => $libraries,
     'js' => array(
       'state' => array(
-        'data' => array('summonerState' => $state),
+        'data' => array('summonerState' => summoner_libraries_state($libraries)),
         'type' => 'setting',
       ),
       'inline' => array(
-        'data' => 'Drupal.summoner.attachBehavior("' . $id . '");',
+        'data' => 'Drupal.summonerAttachBehavior("' . summoner_libraries_string($libraries) . '");',
         'type' => 'inline',
         // @see summoner_js_alter().
         'group' => 'summon',
@@ -91,10 +105,12 @@ function summoner_load($libraries) {
   );
 
   drupal_render($attached);
+
   $page = array(
     '#type' => 'ajax',
     '#commands' => array(),
   );
+
   ajax_deliver($page);
 }
 
