@@ -10,7 +10,6 @@
   Drupal.summonerAttachBehavior = function (libraries) {
     Drupal.behaviors['summonerLoad-' + libraries] = {
       attach: function () {
-        $('a[data-libraries="' + libraries +'"]"').remove();
         if (summonerCallbacks[libraries]) {
           $.each(summonerCallbacks[libraries], function(index, callback) {
             callback();
