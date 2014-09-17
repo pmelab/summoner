@@ -4,10 +4,3 @@ summoner_test.test:
     _content: '\Drupal\summoner_test\Controller\SummonerTestController::testPage'
   requirements:
     _access: 'TRUE'
-
-summoner_test.ajax:
-  path: '/summoner/test/ajax'
-  defaults:
-    _content: '\Drupal\summoner_test\Controller\SummonerTestController::testAjax'
-  requirements:
-    _access: 'TRUE'
