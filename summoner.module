@@ -18,7 +18,7 @@ function summoner_library_alter(array &$library, $name) {
 /**
  * Implements hook_js_alter().
  *
- * Workaround for @todo in AjaxResponse.php line 110.
+ * Workaround for @todo in AjaxResponse.php line 112.
  * Inline js and css are stripped out of ajax responses because of their numeric
  * key. drupal_process_attached() always sets the key numeric, thats why we
  * alter it afterwards.
@@ -31,4 +31,23 @@ function summoner_js_alter(&$js) {
       unset($js[$id]);
     }
   }
+}
+
+/**
+ *  Implements hook_module_implements_alter().
+ */
+function summoner_module_implements_alter(&$implementations, $hook) {
+  if ($hook != 'library_info_alter') {
+    return;
+  }
+  unset($implementations['summoner']);
+  $implementations['summoner'] = FALSE;
+}
+
+/**
+ *  Implements hook_library_info_alter().
+ */
+function summoner_library_info_alter(&$libraries, $module) {
+  $libraryDiscovery = Drupal::service('summoner.libraries');
+  $libraries = $libraryDiscovery->processLibraries($libraries);
 }

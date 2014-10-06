@@ -3,3 +3,6 @@ services:
     class: Drupal\summoner\ParamConverter\LibraryConverter
     tags:
       - { name: paramconverter }
+  summoner.libraries:
+    class: Drupal\summoner\LibraryManager
+    arguments: ['@cache.discovery']
