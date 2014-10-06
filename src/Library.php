@@ -27,6 +27,6 @@ class Library {
    * @return mixed
    */
   public function getPath() {
-    return '/' . $this->path . '/';
+    return $this->path;
   }
 }

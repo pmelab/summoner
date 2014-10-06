@@ -51,7 +51,7 @@ class LibraryManager {
 
   protected function processPath($path) {
     if (preg_match_all('/^\/libraries\/(.*?)\//', $path, $matches)) {
-      return str_replace($matches[0][0], $this->getLibrary($matches[1][0])->getPath(), $path);
+      return '/' . str_replace($matches[0][0], $this->getLibrary($matches[1][0])->getPath() . '/', $path);
     }
   }
 
