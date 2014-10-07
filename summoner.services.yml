@@ -1,8 +1,18 @@
+parameters:
+  summoner.search_paths:
+    - '[profile]/libraries'
+    - 'libraries'
+    - '[site]/libraries'
+
 services:
   summoner.paramconverter.libraries:
     class: Drupal\summoner\ParamConverter\LibraryConverter
     tags:
       - { name: paramconverter }
+  summoner.versionparser:
+    class: Drupal\summoner\BowerVersionParser
+    tags:
+      - { name: versionparser }
   summoner.libraries:
     class: Drupal\summoner\LibraryManager
-    arguments: ['@cache.discovery']
+    arguments: ['@cache.discovery', %summoner.search_paths%]

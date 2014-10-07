@@ -45,9 +45,34 @@ function summoner_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
- *  Implements hook_library_info_alter().
+ * Implements hook_library_info_alter().
+ *
+ * Iterate over all library assets and process the paths accordingly.
  */
 function summoner_library_info_alter(&$libraries, $module) {
   $libraryDiscovery = Drupal::service('summoner.libraries');
-  $libraries = $libraryDiscovery->processLibraries($libraries);
+
+  foreach ($libraries as $id => $library) {
+    if (array_key_exists('js', $library)) {
+      foreach ($library['js'] as $key => $data) {
+        $new_path = $key;
+        unset($libraries[$id]['js'][$key]);
+        if ($libraryDiscovery->processPath($new_path)) {
+          $libraries[$id]['js'][$new_path] = $data;
+        }
+      }
+    }
+
+    if (array_key_exists('css', $library)) {
+      foreach ($library['css'] as $group => $files) {
+        foreach ($files as $key => $data) {
+          $new_path = $key;
+          unset($libraries[$id]['css'][$group][$key]);
+          if ($libraryDiscovery->processPath($new_path)) {
+            $libraries[$id]['css'][$group][$new_path] = $data;
+          }
+        }
+      }
+    }
+  }
 }
