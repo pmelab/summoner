@@ -4,7 +4,7 @@
  * Contains \Drupal\summoner\Tests\LibraryManagerTest.
  */
 
-namespace Drupal\summoner\Tests;
+namespace Drupal\Tests\summoner;
 
 use Drupal\Core\Cache\NullBackend;
 use Drupal\simpletest\KernelTestBase;
@@ -38,6 +38,7 @@ class LibraryManagerTest extends KernelTestBase {
     $profile = drupal_get_path('profile', drupal_get_profile());
     $site = \Drupal::service('kernel')->getSitePath();
 
+    // Check if search paths have been initialized properly.
     $this->assertEqual(array(
       $module . '/tests/libraries',
       $profile . '/libraries',
@@ -54,6 +55,7 @@ class LibraryManagerTest extends KernelTestBase {
     $library = $this->manager->getLibrary('bower_a');
     $this->assertEqual('bower_a', $library->getName(), 'Library "bower_a" found.');
 
+    // Ensure a LibraryNotFoundException is fired if the library doesn't exist.
     $exception = null;
     try {
       $this->assertNull($this->manager->getLibrary('bower_y'), 'Unknown library returns null.');
@@ -62,10 +64,11 @@ class LibraryManagerTest extends KernelTestBase {
       $exception = $exc;
     }
     $this->assertNotNull($exception, 'Library not found exception fired.');
+
   }
 
   public function testPathProcessing() {
-    $module = drupal_get_path('module', 'summoner');
+    $module = '/' . drupal_get_path('module', 'summoner');
 
     // Check a simple base bath to a library.
     $base_path = '/libraries/bower_a';
@@ -75,12 +78,12 @@ class LibraryManagerTest extends KernelTestBase {
     // Check an asset path.
     $asset_path = '/libraries/bower_a/test.js';
     $this->assertTrue($this->manager->processPath($asset_path), 'Asset path process returns TRUE.');
-    $this->assertEqual($base_path, $module . '/tests/libraries/bower_a/test.js', 'Processed asset path is correct.');
+    $this->assertEqual($asset_path, $module . '/tests/libraries/bower_a/test.js', 'Processed asset path is correct.');
 
     // Test behavior for a nonexistent path.
     $unknown_path = '/libraries/bower_y';
-    $this->assertFalse($this->manager->processPath($unknown_path), 'Non-existent path returns false.');
-    $this->assertEqual($base_path, '/libraries/bower_y', 'Unknown path remains untouched.');
+    $this->assertFalse($this->manager->processPath($unknown_path), 'Non-existent path returns FALSE.');
+    $this->assertEqual($unknown_path, '/libraries/bower_y', 'Unknown path remains untouched.');
   }
 
 }

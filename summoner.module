@@ -56,9 +56,9 @@ function summoner_library_info_alter(&$libraries, $module) {
     if (array_key_exists('js', $library)) {
       foreach ($library['js'] as $key => $data) {
         $new_path = $key;
-        unset($libraries[$id]['js'][$key]);
         if ($libraryDiscovery->processPath($new_path)) {
           $libraries[$id]['js'][$new_path] = $data;
+          unset($libraries[$id]['js'][$key]);
         }
       }
     }
@@ -67,9 +67,9 @@ function summoner_library_info_alter(&$libraries, $module) {
       foreach ($library['css'] as $group => $files) {
         foreach ($files as $key => $data) {
           $new_path = $key;
-          unset($libraries[$id]['css'][$group][$key]);
           if ($libraryDiscovery->processPath($new_path)) {
             $libraries[$id]['css'][$group][$new_path] = $data;
+            unset($libraries[$id]['css'][$group][$key]);
           }
         }
       }

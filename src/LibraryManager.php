@@ -47,15 +47,14 @@ class LibraryManager {
    *
    * @param $path
    * @return bool|string
-   * @throws LibraryNotFoundException
    */
   public function processPath(&$path) {
     if (preg_match_all('/^\/libraries\/([^\/]*)/', $path, $matches)) {
       try {
-        $path = '/' . str_replace($matches[0][0], $this->getLibrary($matches[1][0])->getPath() . '/', $path);
+        $path = str_replace($matches[0][0], '/' . $this->getLibrary($matches[1][0])->getPath(), $path);
         return TRUE;
       }
-      catch (Exception $exc) {
+      catch (LibraryNotFoundException $exc) {
         return FALSE;
       }
     }
